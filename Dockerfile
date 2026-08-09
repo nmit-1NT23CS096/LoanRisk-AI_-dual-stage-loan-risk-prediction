@@ -26,12 +26,12 @@ COPY models/ ./models/
 # Copy analytics dataset for dashboard
 COPY notebooks/loan_default_final_ready.csv ./notebooks/loan_default_final_ready.csv
 
-# Expose port
-EXPOSE 8000
+# Expose port (Render assigns PORT dynamically)
+EXPOSE ${PORT:-8000}
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/')" || exit 1
 
-# Run uvicorn
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run uvicorn — uses Render's PORT env var, falls back to 8000 locally
+CMD uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}
