@@ -49,7 +49,7 @@ export default function Dashboard() {
       setTopLoans(loansRes);
     } catch (err) {
       console.error('Failed to load dashboard:', err);
-      setError('Failed to connect to FastAPI backend. Ensure backend server is running on http://127.0.0.1:8000.');
+      setError(`Failed to connect to backend server (${err.message || 'Network Error'}). Please check that the API is active.`);
     } finally {
       setLoading(false);
     }

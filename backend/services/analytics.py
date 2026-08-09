@@ -14,8 +14,13 @@ def get_dataframe() -> pd.DataFrame:
     if _df_cache is None:
         if os.path.exists(CSV_PATH):
             try:
-                # Load sample or full dataset cleanly
-                df = pd.read_csv(CSV_PATH)
+                # Load key columns with row limit to fit within Render free tier memory (512MB limit)
+                cols_to_load = ['loan_default', 'loan_amnt', 'fico_range_low', 'dti', 'annual_inc', 'grade', 'purpose', 'term']
+                # Read header first to see available columns
+                header = pd.read_csv(CSV_PATH, nrows=0).columns.tolist()
+                avail_cols = [c for c in cols_to_load if c in header]
+                
+                df = pd.read_csv(CSV_PATH, usecols=avail_cols if avail_cols else None, nrows=10000)
                 
                 # Fill missing key fields for robust calculations
                 if 'loan_default' not in df.columns:
