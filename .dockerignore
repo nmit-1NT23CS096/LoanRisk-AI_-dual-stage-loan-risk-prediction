@@ -1,0 +1,57 @@
+# ============================================
+# .dockerignore — LoanRisk AI
+# ============================================
+
+# Git
+.git/
+.gitignore
+
+# Frontend (not part of backend Docker image)
+frontend/
+node_modules/
+
+# Raw dataset (1.67 GB — NOT needed in Docker)
+accepted_2007_to_2018Q4.csv
+
+# Notebook files (except the analytics CSV, which is copied explicitly)
+notebooks/*.ipynb
+notebooks/*.npy
+notebooks/*.pkl
+
+# Images (README assets only)
+images/
+
+# Legacy static frontend files
+index.html
+app.js
+style.css
+utils.js
+pre_loan.html
+post_loan.html
+pre_approval.html
+post_default.html
+dashboard.html
+
+# Documentation
+README.md
+DEPLOYMENT.md
+*.md
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files
+.env
+.env.*
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Gemini / IDE
+.gemini/
+.agents/
+.vscode/

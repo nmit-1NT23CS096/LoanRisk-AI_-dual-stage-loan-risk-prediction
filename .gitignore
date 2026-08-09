@@ -1,10 +1,7 @@
 # Python
 __pycache__/
 *.pyc
-
-# Dataset
-accepted_2007_to_2018Q4.csv
-
+*.pyo
 
 # Virtual Environment
 .venv/
@@ -17,15 +14,37 @@ env/
 # VS Code
 .vscode/
 
-# Models
-*.pkl
-*.joblib
+# ============================================
+# Large / Sensitive Files
+# ============================================
 
-# Large datasets
-*.csv
-*.parquet
+# Raw Lending Club dataset (1.67 GB — too large for Git)
+accepted_2007_to_2018Q4.csv
+
+# Notebook training artifacts (not needed for deployment)
+notebooks/*.npy
+notebooks/*.pkl
+
+# ============================================
+# ALLOW model files used by backend
+# ============================================
+# models/**/*.pkl are tracked (force-added)
+
+# ============================================
+# Frontend
+# ============================================
+frontend/node_modules/
+frontend/dist/
+
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.local
+.env.production
+frontend/.env.production
+frontend/.env.local
 
 # System files
 .DS_Store
-Thumbs.db   
-
+Thumbs.db

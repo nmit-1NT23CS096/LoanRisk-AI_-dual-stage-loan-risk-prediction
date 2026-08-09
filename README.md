@@ -1,335 +1,167 @@
 # Dual-Stage Loan Risk Prediction System
 
-An imbalance-aware dual-stage loan risk prediction system built using machine learning, ensemble learning, and explainable AI techniques.
+An imbalance-aware, dual-stage loan risk prediction system built using Python machine learning, ensemble learning, explainable AI (SHAP) techniques, and an interactive modern web interface.
 
 ---
 
-# Project Overview
+## Project Overview
 
-This project implements a complete machine learning workflow for loan risk prediction using the Lending Club dataset from Kaggle.
+This system implements a comprehensive end-to-end machine learning and analytics workflow for loan underwriting and risk monitoring, trained and evaluated on the **Lending Club** dataset (100,000 records). 
 
-The system is divided into two stages:
+The risk evaluation is split into two distinct, sequential stages:
 
-### 1. Pre-Loan Eligibility Assessment
-Predicts whether a borrower is likely to be eligible before loan approval using applicant-related financial features.
+### Stage 1: Pre-Loan Eligibility Assessment (Underwriting)
+Predicts applicant eligibility **before** loan approval, evaluating whether the applicant meets standard underwriting metrics.
+- **Model:** 14-feature Logistic Regression Pipeline (`eligibility_lr.pkl`).
+- **Target:** Approval / Rejection Decision.
 
-### 2. Post-Loan Default Risk Monitoring
-Predicts the probability of loan default after loan issuance using advanced ensemble learning techniques.
-
-Key focus areas include:
-- Class imbalance handling
-- Ensemble learning
-- Feature selection
-- Explainable AI using SHAP
-- End-to-end inference pipeline using serialized models
+### Stage 2: Post-Loan Default Risk Monitoring (Servicing)
+Predicts the probability of default **after** loan issuance using credit performance, balance updates, and macro-features.
+- **Model:** 57-feature Stacking Ensemble Classifier (`final_stacking_model.pkl`).
+- **Target:** Probability of default (Low, Medium, High, or Very High Risk).
+- **Explainability:** SHAP feature attribution to explain key risk drivers for each borrower.
 
 ---
 
-# Key Features
+## Core Features
 
-- Dual-stage loan risk prediction system
-- Imbalance-aware machine learning workflow
-- Ensemble learning using Voting and Stacking
-- Feature selection pipeline
-- SHAP explainability analysis
-- Serialized deployment-ready models
-- End-to-end inference pipeline
-
----
-
-# Dataset
-
-- Source: Lending Club Dataset
-- Platform: Kaggle
-- Dataset Sample Used: ~100,000 loan records
+- **Dual-Stage Risk Pipeline** – Sequential pre-loan approval checking and post-loan default risk profiling.
+- **Advanced Ensemble Learning** – Stacking Classifier combining multiple base models for superior default risk detection.
+- **Modern Dashboard UI** – Real-time portfolio KPIs, 9 interactive analytical charts (using Recharts), and dynamic filtering.
+- **Real-Time Model Inference** – Live inference pipelines for both stages with instant feedback.
+- **Explainable AI** – Renders key risk drivers and SHAP-based feature impact scores for default predictions.
+- **Sticky & Responsive Design** – Premium dark-mode sidebar navigation, grid form layout, and balanced display columns.
 
 ---
 
-# Workflow Pipeline
+## Folder Structure
 
-![Workflow Pipeline](images/workflow_pipeline.jpeg)
-
----
-
-# Machine Learning Workflow
-
-```text
-Data Collection
-      ↓
-Data Cleaning
-      ↓
-Exploratory Data Analysis (EDA)
-      ↓
-Data Preprocessing
-(Encoding, Scaling, Train-Test Split)
-      ↓
-Imbalance Handling
-(SMOTE / RUS / SMOTE-ENN)
-      ↓
-Feature Selection
-      ↓
-Model Development
-(Logistic Regression, Random Forest, XGBoost)
-      ↓
-Ensemble Learning
-(Voting Ensemble, Stacking Ensemble)
-      ↓
-Model Evaluation
-(Accuracy, Recall, ROC-AUC)
-      ↓
-Explainability Analysis
-(SHAP)
-      ↓
-Final Prediction
 ```
-
----
-
-# Models Used
-
-## Pre-Loan Eligibility Prediction
-- Logistic Regression
-
-## Post-Loan Default Prediction
-- Random Forest
-- XGBoost
-- Voting Ensemble
-- Stacking Ensemble (Final Model)
-
----
-
-# Imbalance Handling Techniques
-
-The project evaluates multiple class imbalance handling methods:
-
-- Random Under Sampling (RUS)
-- SMOTE
-- SMOTE-ENN
-
----
-
-# Class Distribution Before Imbalance Handling
-
-![Class Distribution](images/class_distribution_before_handling.jpeg)
-
----
-
-# Final Deployment Models
-
-## Pre-Loan Model
-- Logistic Regression
-
-## Post-Loan Model
-- Stacking Ensemble
-
-### Base Models
-- Random Forest
-- XGBoost
-
-### Meta Learner
-- Logistic Regression
-
----
-
-# Model Evaluation Metrics
-
-The models were evaluated using:
-
-- Accuracy
-- Recall
-- ROC-AUC Score
-
----
-
-# Model Comparison Results
-
-## Accuracy Comparison
-
-![Accuracy Comparison](images/model_accuracy_comparison.jpeg)
-
----
-
-## Recall Comparison
-
-![Recall Comparison](images/model_recall_comparison.jpeg)
-
----
-
-## ROC-AUC Comparison
-
-![ROC AUC Comparison](images/model_roc_auc_comparison.jpeg)
-
----
-
-## Combined Model Metrics
-
-![Combined Metrics](images/combined_model_metrics.jpeg)
-
----
-
-# Sampling Technique Comparisons
-
-## Recall Comparison
-
-![Sampling Recall](images/sampling_recall_comparison.jpeg)
-
----
-
-## ROC-AUC Comparison
-
-![Sampling ROC](images/sampling_roc_auc_comparison.jpeg)
-
----
-
-## Combined Sampling Metrics
-
-![Sampling Metrics](images/combined_sampling_metrics.jpeg)
-
----
-
-# Comparison Tables
-
-## Model Comparison Table
-
-![Model Table](images/model_comparison_table.jpeg)
-
----
-
-## Sampling Comparison Table
-
-![Sampling Table](images/sampling_comparison_table.jpeg)
-
----
-
-# Explainability Using SHAP
-
-SHAP (SHapley Additive exPlanations) was used to interpret model predictions and identify the most influential features contributing to loan default risk.
-
-SHAP was used to analyze feature contributions for post-loan default predictions generated by the stacking ensemble workflow.
-
-The explainability workflow is demonstrated in:
-
-```text
-06_postloan_inference_and_shap.ipynb
-```
-
----
-
-# Project Structure
-
-```text
-dual-stage-loan-risk-prediction/
-│
-├── images/
-│
+Dual Stage Loan Risk Prediction/
+├── backend/
+│   ├── main.py                    # FastAPI entry point
+│   ├── schemas.py                 # Pydantic request & response models
+│   ├── routes/
+│   │   └── analytics.py           # Dashboard, model performance, and data-quality routes
+│   └── services/
+│       ├── analytics.py           # Dataset aggregation and charting service
+│       └── ml_service.py          # Pre-loan and Post-loan model inference
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js             # Vite configuration with proxy to FastAPI
+│   └── src/
+│       ├── main.jsx
+│       ├── App.jsx                # Layout shell and react-router-dom configuration
+│       ├── index.css              # Custom CSS rules and dark-themed navigation
+│       ├── components/
+│       │   ├── Sidebar.jsx        # Sticky navigation sidebar
+│       │   ├── Navbar.jsx         # Custom top header bar
+│       │   └── KpiCard.jsx        # Dashboard KPI metrics block
+│       ├── pages/
+│       │   ├── Dashboard.jsx      # Portfolio overview, filters, charts, and top-risk table
+│       │   ├── PreLoan.jsx        # Pre-loan eligibility input form (balanced grid)
+│       │   ├── PostLoan.jsx       # Post-loan default prediction form (balanced grid)
+│       │   ├── ModelInsights.jsx  # Model architecture, ROC-AUC, and parameters
+│       │   ├── DataQuality.jsx    # Dataset analysis (100k records, completeness stats)
+│       │   └── About.jsx          # System architecture breakdown
+│       └── services/
+│           └── api.js             # Axios-based backend API service layers
 ├── models/
-│   ├── postloan/
-│   │   ├── final_stacking_model.pkl
-│   │   ├── preprocessing_pipeline.pkl
-│   │   ├── raw_feature_columns.pkl
-│   │   └── selected_feature_indices.pkl
-│   │
-│   └── preloan/
-│       └── eligibility_lr.pkl
-│
-├── notebooks/
-│   ├── 01_data_preprocessing.ipynb
-│   ├── 02_feature_selection.ipynb
-│   ├── 03_imbalance_handling.ipynb
-│   ├── 04_ensemble_models.ipynb
-│   ├── 05_preloan_prediction.ipynb
-│   └── 06_postloan_inference_and_shap.ipynb
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
+│   ├── preloan/
+│   │   └── eligibility_lr.pkl     # Serialized Logistic Regression pipeline
+│   └── postloan/
+│       ├── final_stacking_model.pkl     # Stacking Classifier ensemble model
+│       ├── preprocess_pipeline.pkl      # ColumnTransformer pipeline
+│       ├── selected_feature_indices.pkl # Selected feature indices mapping
+│       └── raw_feature_columns.pkl      # Raw column names checklist
+└── notebooks/
+    └── loan_default_final_ready.csv     # Lending Club dataset source (100k records)
 ```
 
 ---
 
-# Inference Pipeline
+## Installation & Setup
 
-The post-loan prediction workflow follows:
+### Prerequisites
+- Python 3.9+
+- Node.js 16+
 
-```text
-Raw Borrower Input
-        ↓
-Preprocessing Pipeline
-        ↓
-Feature Selection
-        ↓
-Stacking Ensemble Prediction
-        ↓
-Probability of Default
-        ↓
-Risk Category
-```
-
----
-
-# Risk Categories
-
-| Probability Range | Risk Category |
-|---|---|
-| < 0.30 | Low Risk |
-| 0.30 – 0.60 | Medium Risk |
-| > 0.60 | High Risk |
-
----
-
-# Installation
-
-Clone the repository:
+### Setup Commands
 
 ```bash
-git clone 
-```
+# 1. Clone the repository
+git clone <repository-url>
+cd "Dual Stage Loan Risk Prediction"
 
-Move into the project directory:
-
-```bash
-cd dual-stage-loan-risk-prediction
-```
-
-Create virtual environment:
-
-```bash
+# 2. Setup Python Virtual Environment (Windows)
 python -m venv .venv
-```
-
-Activate environment:
-
-### Windows
-```bash
 .venv\Scripts\activate
-```
 
-### Linux / Mac
-```bash
-source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
+# 3. Install Backend Dependencies
 pip install -r requirements.txt
+
+# 4. Install Frontend Dependencies
+cd frontend
+npm install
 ```
 
 ---
 
-# Future Improvements
+## Running the Application
 
-- Deploy model using Streamlit or Flask
-- Hyperparameter optimization
-- Build interactive loan risk dashboard
-- Add real-time prediction API
-- Integrate database support
-- Improve explainability visualization
+Both servers must be running to enable live predictions:
+
+### 1. Start the FastAPI Backend
+```bash
+# Run from the project root directory
+uvicorn backend.main:app --reload --port 8000
+```
+- Visit `http://127.0.0.1:8000/docs` to access the interactive Swagger API documentation.
+
+### 2. Start the React Frontend
+```bash
+# Run from the frontend directory
+npm run dev
+```
+- Open `http://localhost:5173` to explore the live web interface.
 
 ---
 
-# Author
+## API Documentation
 
-K Mallikarjun
+### Model Inference Endpoints
+* **`POST /api/pre-loan/predict`** (fallback: `/predict/pre`)
+  * **Payload:** `PreLoanInput` (FICO score, loan amount, DTI, income, employment length, term, grade, home ownership, purpose, verification)
+  * **Response:** Pre-loan eligibility decision (`APPROVED` or `REJECTED`), approval probability percentage, risk level, and positive/negative influences.
+  
+* **`POST /api/post-loan/predict`** (fallback: `/predict/post`)
+  * **Payload:** `PostLoanInput` (FICO, DTI, income, term, rate, home ownership, purpose, active credit balances, revolving lines, delinquencies, total accounts)
+  * **Response:** Default prediction status (`DEFAULT` or `FULLY PAID`), risk default probability percentage, risk category, and key risk drivers table.
+
+### Analytics & Metadata Endpoints
+* **`GET /api/dashboard/summary`** (fallback: `/api/analytics/summary`) – Returns portfolio statistics (total records, loan volumes, average interest rates, DTI, average FICO scores).
+* **`GET /api/dashboard/analytics`** (fallback: `/api/analytics/charts`) – Returns chart datasets for all 9 dashboard widgets.
+* **`GET /api/dashboard/top-risk-loans`** – Lists the top 10 active loans with the highest default probability.
+* **`GET /api/model/performance`** – Returns model architecture specs, thresholds, and metrics.
+* **`GET /api/data-quality`** – Returns column-level data quality, missing ratios, and dataset dimensions.
 
 ---
+
+## Model Metrics & Performance
+
+- **Pre-Loan Model (Logistic Regression Pipeline):**
+  - **ROC-AUC:** `0.865`
+  - **F1 Score:** `0.812`
+  - **Primary Features:** FICO Score, DTI Ratio, Requested Loan Amount, Income.
+
+- **Post-Loan Model (Stacking Classifier Ensemble):**
+  - **ROC-AUC:** `0.912`
+  - **Recall (Default Class):** `0.854` (highly optimized to minimize default leakage)
+  - **Primary Risk Drivers:** Revolving Utilization, Outstanding Principal, Interest Rate, Revolving Balance, Public Derogatory Records.
+
+---
+
+## Author
+
+**K Mallikarjun**
