@@ -17,6 +17,8 @@ POST_PREP_PATH = os.path.join(BASE_DIR, 'models', 'postloan', 'preprocess_pipeli
 POST_SEL_IDX_PATH = os.path.join(BASE_DIR, 'models', 'postloan', 'selected_feature_indices.pkl')
 POST_RAW_COLS_PATH = os.path.join(BASE_DIR, 'models', 'postloan', 'raw_feature_columns.pkl')
 
+import gc
+
 class MLService:
     def __init__(self):
         self.pre_model = None
@@ -24,19 +26,31 @@ class MLService:
         self.post_prep = None
         self.post_sel_idx = None
         self.post_raw_cols = None
-        self._load_models()
+        self._post_models_attempted = False
+        self._load_pre_model()
 
-    def _load_models(self):
-        # Load Pre-Loan Model
+    def _load_pre_model(self):
+        # Load Pre-Loan Model eagerly since it's tiny (~6.7 KB)
         if os.path.exists(PRE_MODEL_PATH):
             try:
                 self.pre_model = joblib.load(PRE_MODEL_PATH)
                 print("Pre-loan model loaded successfully.")
             except Exception as e:
                 print(f"Error loading pre-loan model: {e}")
+
+    def _ensure_post_models_loaded(self):
+        """Lazy load post-loan heavy stacking model assets only on demand."""
+        if self._post_models_attempted:
+            return
+        self._post_models_attempted = True
         
-        # Load Post-Loan Model Assets
+        # Check if disabled via environment variable for ultra-low memory environments
+        if os.getenv("DISABLE_HEAVY_POST_MODEL", "false").lower() == "true":
+            print("Heavy post-loan model loading disabled via env var. Using heuristic fallback.")
+            return
+
         try:
+            print("Lazy loading post-loan model assets...")
             if os.path.exists(POST_MODEL_PATH):
                 self.post_model = joblib.load(POST_MODEL_PATH)
             if os.path.exists(POST_PREP_PATH):
@@ -46,8 +60,12 @@ class MLService:
             if os.path.exists(POST_RAW_COLS_PATH):
                 self.post_raw_cols = joblib.load(POST_RAW_COLS_PATH)
             print("Post-loan model assets loaded successfully.")
-        except Exception as e:
-            print(f"Error loading post-loan model assets: {e}")
+        except (MemoryError, Exception) as e:
+            print(f"Post-loan model loading failed (will use heuristic fallback): {e}")
+            self.post_model = None
+            self.post_prep = None
+        finally:
+            gc.collect()
 
     def predict_pre_loan(self, input_data: dict) -> dict:
         """
@@ -128,6 +146,7 @@ class MLService:
         """
         Post-loan default prediction using Stacking Classifier on 57 selected preprocessed features.
         """
+        self._ensure_post_models_loaded()
         raw_cols = self.post_raw_cols if self.post_raw_cols else []
         row = {col: 0.0 for col in raw_cols}
 

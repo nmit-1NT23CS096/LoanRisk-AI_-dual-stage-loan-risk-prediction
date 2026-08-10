@@ -20,19 +20,34 @@ def get_dataframe() -> pd.DataFrame:
                 header = pd.read_csv(CSV_PATH, nrows=0).columns.tolist()
                 avail_cols = [c for c in cols_to_load if c in header]
                 
-                df = pd.read_csv(CSV_PATH, usecols=avail_cols if avail_cols else None, nrows=10000)
+                df = pd.read_csv(CSV_PATH, usecols=avail_cols if avail_cols else None, nrows=5000)
                 
                 # Fill missing key fields for robust calculations
                 if 'loan_default' not in df.columns:
                     df['loan_default'] = 0
+                else:
+                    df['loan_default'] = df['loan_default'].fillna(0).astype('int8')
+
                 if 'loan_amnt' not in df.columns:
                     df['loan_amnt'] = 10000.0
+                else:
+                    df['loan_amnt'] = df['loan_amnt'].astype('float32')
+
                 if 'fico_range_low' not in df.columns:
                     df['fico_range_low'] = 700
+                else:
+                    df['fico_range_low'] = df['fico_range_low'].astype('float32')
+
                 if 'dti' not in df.columns:
                     df['dti'] = 18.0
+                else:
+                    df['dti'] = df['dti'].astype('float32')
+
                 if 'annual_inc' not in df.columns:
                     df['annual_inc'] = 65000.0
+                else:
+                    df['annual_inc'] = df['annual_inc'].astype('float32')
+
                 if 'grade' not in df.columns:
                     df['grade'] = 'B'
                 if 'purpose' not in df.columns:
@@ -41,6 +56,8 @@ def get_dataframe() -> pd.DataFrame:
                     df['term'] = ' 36 months'
                     
                 _df_cache = df
+                import gc
+                gc.collect()
             except Exception as e:
                 print(f"Error reading dataset CSV: {e}")
                 _df_cache = _generate_fallback_dataframe()
